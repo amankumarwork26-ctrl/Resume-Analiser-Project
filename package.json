@@ -1,0 +1,16 @@
+{
+  "name": "resume-analyzer",
+  "version": "1.0.0",
+  "description": "AI Resume Analyzer Backend",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "node-fetch": "^3.3.2"
+  }
+}
