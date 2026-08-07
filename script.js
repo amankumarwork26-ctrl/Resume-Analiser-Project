@@ -771,7 +771,25 @@ function renderPreview() {
   sheet.style.display = '';
   sheet.className = 'resume-sheet ' + tpl.id;
   sheet.innerHTML = sheetHtml(merged, tpl);
+  fitResumePreview();
 }
+
+// Fit the 560px resume sheet into the preview width on small screens (phone/tablet).
+function fitResumePreview() {
+  const sheet = document.getElementById('resumeSheet');
+  const preview = sheet && sheet.closest('.builder-preview');
+  if (!sheet || !preview) return;
+  if (preview.clientWidth === 0) return;
+  const cs = window.getComputedStyle(preview);
+  const avail = preview.clientWidth - parseFloat(cs.paddingLeft || 0) - parseFloat(cs.paddingRight || 0);
+  const scale = Math.min(1, avail / 560);
+  sheet.style.zoom = scale;
+}
+
+window.addEventListener('resize', () => {
+  clearTimeout(fitResumePreview._t);
+  fitResumePreview._t = setTimeout(fitResumePreview, 150);
+});
 
 // ---------- State collection from form DOM ----------
 function splitLines(text) {
@@ -1122,7 +1140,10 @@ function switchTab(tab) {
   document.getElementById('builderSection').classList.toggle('hidden', tab !== 'builder');
   document.getElementById('tabAnalyzer').classList.toggle('active', tab === 'analyzer');
   document.getElementById('tabBuilder').classList.toggle('active', tab === 'builder');
-  if (tab === 'builder') buildTemplateThumbs();
+  if (tab === 'builder') {
+    buildTemplateThumbs();
+    renderPreview();
+  }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -1189,6 +1210,7 @@ async function downloadPdf() {
   // (Off-screen / hidden elements html2canvas blank/white PDF dete hain.)
   const el = preview.cloneNode(true);
   el.setAttribute('aria-hidden', 'true');
+  el.style.zoom = '1';
   el.style.position = 'relative';
   el.style.left = 'auto';
   el.style.top = 'auto';
