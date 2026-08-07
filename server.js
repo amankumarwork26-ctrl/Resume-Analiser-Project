@@ -197,6 +197,10 @@ app.post("/api/analyze", async (req, res) => {
       return res.status(400).json({ error: "textContent is required" });
     }
 
+    if (!process.env.API_KEY) {
+      return res.status(503).json({ error: "Analysis service is not configured. Add API_KEY to the server environment." });
+    }
+
     // Build user message
     const userMessage = jobDescription
       ? `Analyze this resume:\n\n${textContent}\n\nJob Description to match against:\n\n${jobDescription}\n\nReturn JSON only.`
@@ -214,20 +218,20 @@ app.post("/api/analyze", async (req, res) => {
           "X-Title": "ResumeInsight AI"
         },
         body: JSON.stringify({
-          model: "openai/gpt-4o-mini",
+          model: process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini",
           messages: [
             { role: "system", content: SYSTEM_PROMPT },
             { role: "user",   content: userMessage   }
           ],
           temperature: 0.2,           // Low = deterministic, consistent JSON output
           top_p: 0.9,
-          max_tokens: 2048,
+          max_tokens: 600,           // Faster response (smaller output = quicker results)
           response_format: { type: "json_object" }  // Force strict JSON mode
         }),
-        signal: AbortSignal.timeout(60_000)          // 60-second hard timeout
+        signal: AbortSignal.timeout(25_000)          // Fast failure instead of a long wait
       },
-      3,    // max retries
-      1200  // base delay ms
+      2,   // One retry for temporary provider errors
+      500  // short backoff
     );
 
     const openRouterData = await openRouterRes.json();
