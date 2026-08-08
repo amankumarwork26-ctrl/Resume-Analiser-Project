@@ -183,7 +183,7 @@ Rules:
 // Health Check
 // ─────────────────────────────────────────────────────────────
 app.get("/", (req, res) => {
-  res.send("✅ Backend Started Successfully!");
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
 // ─────────────────────────────────────────────────────────────

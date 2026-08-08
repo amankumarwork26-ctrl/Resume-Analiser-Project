@@ -1619,6 +1619,29 @@ body::after {
 
 .b-dropdown-item:hover { background: var(--primary-light); color: var(--primary); }
 
+.b-preview-download {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, .4), 0 2px 8px rgba(15, 23, 42, .15);
+  background: linear-gradient(135deg, #2563EB, #7C3AED);
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, .85);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.b-preview-download:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 10px 24px rgba(37, 99, 235, .5), 0 0 0 6px rgba(37, 99, 235, .15);
+}
+
+.b-preview-download:active { transform: scale(.95); }
+
+.b-preview-download svg { width: 19px; height: 19px; }
+
 .b-dropdown-item .b-dd-icon { font-size: 15px; }
 
 .b-dropdown-item .b-dd-name { flex: 1; }
@@ -1879,6 +1902,13 @@ body::after {
 .b-btn-ai:hover { box-shadow: var(--shadow-md), 0 0 20px rgba(124, 58, 237, .45); transform: translateY(-1px); }
 
 .builder-preview { position: relative; }
+
+.builder-preview > .b-download {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+}
 
 .preview-empty {
   display: flex;
@@ -2714,7 +2744,6 @@ body::after {
   .builder-toolbar { flex-direction: column; align-items: stretch; gap: 12px; }
   .builder-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .builder-actions .b-btn { justify-content: center; width: 100%; }
-  .b-download > .b-btn { width: 100%; }
   .template-picker { padding: 16px; }
   .tpl-row { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
   .tpl-card { height: 140px; }
@@ -2766,6 +2795,7 @@ body::after {
   .builder-section { display: none !important; }
   .builder-section:not(.hidden) { display: block !important; }
   .builder-layout { display: block !important; }
+  .builder-preview > .b-download { display: none !important; }
   .builder-preview { background: #fff; border: none; box-shadow: none; padding: 0; border-radius: 0; justify-content: flex-start; }
   .resume-sheet {
     width: 210mm;
