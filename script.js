@@ -39,6 +39,13 @@ uploadZone.addEventListener('drop', e => {
   const f = e.dataTransfer.files[0];
   if (f) handleFile(f);
 });
+uploadZone.addEventListener('click', () => fileInput.click());
+uploadZone.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    fileInput.click();
+  }
+});
 fileInput.addEventListener('change', e => {
   if (e.target.files[0]) handleFile(e.target.files[0]);
 });
@@ -726,36 +733,35 @@ function sheetHtml(state, tpl) {
 
 function getMergedState() {
   const s = collectState();
-  const d = SAMPLE;
   const includeExp = document.getElementById('includeExperience')?.checked !== false;
   const includeIntern = document.getElementById('includeInternship')?.checked !== false;
   const toggleOn = id => document.getElementById(id)?.checked !== false;
-  const isStudent = getTpl(BUILDER_STATE.active).family === 'Student' || getTpl(BUILDER_STATE.active).family === 'Fresher';
 
-  // Merge: user ke bhare hue fields dikhao, baaki khali fields sample se bhare rahenge
-  // (taaki resume kabhi blank na dikhe)
+  // WYSIWYG: download/preview hamesha form me jo likha hai wahi dikhata hai.
+  // (Pehle khali fields sample data se bhari jaati thin — delete/clear karne par
+  //  purana content wapas aa jata tha, isliye ab exactly user data use hota hai.)
   return {
     personal: {
-      name: s.personal.name || d.personal.name,
-      title: s.personal.title || d.personal.title,
-      email: s.personal.email || d.personal.email,
-      phone: s.personal.phone || d.personal.phone,
-      location: s.personal.location || d.personal.location,
-      linkedin: toggleOn('useLinkedin') ? (s.personal.linkedin || d.personal.linkedin) : '',
-      github: toggleOn('useGithub') ? (s.personal.github || d.personal.github) : '',
-      website: toggleOn('useWebsite') ? (s.personal.website || d.personal.website) : '',
-      summary: s.personal.summary || (isStudent ? d.personal.summaryStudent : d.personal.summary)
+      name: s.personal.name,
+      title: s.personal.title,
+      email: s.personal.email,
+      phone: s.personal.phone,
+      location: s.personal.location,
+      linkedin: toggleOn('useLinkedin') ? s.personal.linkedin : '',
+      github: toggleOn('useGithub') ? s.personal.github : '',
+      website: toggleOn('useWebsite') ? s.personal.website : '',
+      summary: s.personal.summary
     },
-    experience: !includeExp ? [] : (s.experience.length ? s.experience : d.experience),
-    internship: !includeIntern ? [] : (s.internship.length ? s.internship : d.internship),
-    projects: s.projects.length ? s.projects : d.projects,
-    education: s.education.length ? s.education : d.education,
-    certifications: s.certifications.length ? s.certifications : d.certifications,
-    skills: s.skills.length ? s.skills : d.skills,
-    achievements: s.achievements.length ? s.achievements : d.achievements,
-    por: s.por.length ? s.por : d.por,
-    languages: s.languages.length ? s.languages : d.languages,
-    interests: s.interests.length ? s.interests : d.interests
+    experience: !includeExp ? [] : s.experience,
+    internship: !includeIntern ? [] : s.internship,
+    projects: s.projects,
+    education: s.education,
+    certifications: s.certifications,
+    skills: s.skills,
+    achievements: s.achievements,
+    por: s.por,
+    languages: s.languages,
+    interests: s.interests
   };
 }
 

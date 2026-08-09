@@ -13,7 +13,10 @@ const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.static(__dirname));
+app.use(express.static(__dirname, {
+  etag: true,
+  setHeaders: (res) => res.setHeader('Cache-Control', 'no-cache')
+}));
 app.use(express.json({ limit: "2mb" }));
 
 // ─────────────────────────────────────────────────────────────
@@ -197,8 +200,10 @@ app.post("/api/analyze", async (req, res) => {
       return res.status(400).json({ error: "textContent is required" });
     }
 
-    if (!process.env.API_KEY) {
-      return res.status(503).json({ error: "Analysis service is not configured. Add API_KEY to the server environment." });
+    const apiKey = process.env.API_KEY;
+    const keyIsMissing = !apiKey || apiKey.includes("PASTE_YOUR_OPENROUTER_API_KEY_HERE") || apiKey.startsWith("sk-or-v1-PASTE");
+    if (keyIsMissing) {
+      return res.status(503).json({ error: "Analysis service is not configured. Add a valid API_KEY to the server environment." });
     }
 
     // Build user message
@@ -225,7 +230,7 @@ app.post("/api/analyze", async (req, res) => {
           ],
           temperature: 0.2,           // Low = deterministic, consistent JSON output
           top_p: 0.9,
-          max_tokens: 600,           // Faster response (smaller output = quicker results)
+          max_tokens: 2000,          // Full JSON schema ke liye enough (600 se truncate ho raha tha)
           response_format: { type: "json_object" }  // Force strict JSON mode
         }),
         signal: AbortSignal.timeout(25_000)          // Fast failure instead of a long wait
@@ -300,5 +305,10 @@ app.listen(PORT, () => {
   console.clear();
   console.log("✅ Backend Started Successfully!");
   console.log(`🌐 Server: http://localhost:${PORT}`);
+  const apiKey = process.env.API_KEY;
+  const keyIsMissing = !apiKey || apiKey.includes("PASTE_YOUR_OPENROUTER_API_KEY_HERE") || apiKey.startsWith("sk-or-v1-PASTE");
+  console.log(keyIsMissing
+    ? "⚠️  API_KEY is MISSING or is a placeholder — add a valid OpenRouter key to .env and restart."
+    : "🔑 API_KEY configured ✓");
   console.log("🚀 API is Ready");
 });
